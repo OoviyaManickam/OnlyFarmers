@@ -98,7 +98,7 @@ export default function StakePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
                 {/* Total BTC Deposited */}
                 <div className="text-center">
-                  <h3 className="text-zinc-400 font-space-grotesk text-lg mb-3">Total BTC Staked</h3>
+                  <h3 className="text-zinc-400 font-space-grotesk text-lg mb-3">Total Staked</h3>
                   <span className="text-3xl font-bold text-white font-space-grotesk bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text">$18,000</span>
                 </div>
 
