@@ -95,7 +95,7 @@ export default function StakePage() {
                 </div>
                 <h2 className="text-2xl font-bold mb-4 text-white font-space-grotesk">Grow with Yield</h2>
                 <p className="text-zinc-400 font-space-grotesk">
-                As the crops thrive, so does your stake. Yields are shared between farmers and supporters based on real performance—not speculation.                </p>
+                As the crops thrive, so does your stake. Yields are shared between farmers and supporters based on real performance ,not speculation.                </p>
               </motion.div>
             </div>
 
