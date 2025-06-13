@@ -57,7 +57,7 @@ export default function SubmitStakePage() {
     setShowSuccess(true);
     setTimeout(() => {
       router.push('/start-stake');
-    }, 5000);
+    }, 4000);
   };
 
   if (!selectedFarm) {
