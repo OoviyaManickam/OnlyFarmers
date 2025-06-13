@@ -129,7 +129,7 @@ export default function HomePage() {
               <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,transparent_30%,black_70%)]"></div>
             </div>
 
-            <div className="container mx-auto px-6 lg:px-8">
+            <div className="container mx-auto pt-6 pb-15 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 {/* Left Side - Typing Animation */}
                 <div className="relative">
