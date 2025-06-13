@@ -12,7 +12,7 @@ export default function StakePage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-cyan-900/10 via-black/0 to-transparent"></div>
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
-        <div className="container mx-auto px-6 lg:px-8 p-10 flex-grow">
+        <div className="container mx-auto px-6 lg:px-8 p-5 flex-grow">
           {/* Hero Section */}
           <div className="pt-32 lg:pt-40">
             <motion.div
@@ -104,7 +104,7 @@ export default function StakePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-25 pb-10"
+              className="mt-15 pb-10"
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
                 {/* Total BTC Deposited */}
