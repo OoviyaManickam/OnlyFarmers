@@ -110,7 +110,7 @@ export default function HomePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4 font-space-grotesk">ZK-Proofs to verify your identity without compromise</h3>
+                  <h3 className="text-xl font-bold text-white mb-4 font-space-grotesk">Earn Together, Grow Together</h3>
                   <p className="text-zinc-400 font-space-grotesk leading-relaxed">
                     Stay private, stay secure! With Zero-Knowledge Proofs, users can verify their identity without revealing personal data—ensuring trust, compliance, and seamless access.
                   </p>
