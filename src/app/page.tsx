@@ -112,7 +112,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-xl font-bold text-white mb-4 font-space-grotesk">Earn Together, Grow Together</h3>
                   <p className="text-zinc-400 font-space-grotesk leading-relaxed">
-                    Stay private, stay secure! With Zero-Knowledge Proofs, users can verify their identity without revealing personal data—ensuring trust, compliance, and seamless access.
+                    Stay private, stay secure! With Zero-KnowStaking rewards are split fairly—80% to stakers, 17% to farmers, 2% to a sustainability pool, and 1% to the platform—ensuring transparent, purpose-driven incentives for all.
                   </p>
                 </div>
 
