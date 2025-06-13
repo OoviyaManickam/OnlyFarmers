@@ -5,6 +5,7 @@ import { useState } from "react";
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { MagnifyingGlassIcon, FunnelIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 
 // Mock data for farms
 const farms = [
@@ -28,13 +29,99 @@ const farms = [
     status: "Full",
     growthData: [8, 12, 15, 18, 20, 22.8]
   },
-  // Add more mock data as needed
+  {
+    id: "FARM-2024-003",
+    piCoreId: "PC-7892",
+    maxYield: 26.3,
+    health: "Excellent",
+    yieldScore: 95,
+    apy: 20.1,
+    status: "Available",
+    growthData: [12, 16, 20, 23, 25, 26.3]
+  },
+  {
+    id: "FARM-2024-004",
+    piCoreId: "PC-7893",
+    maxYield: 21.5,
+    health: "Good",
+    yieldScore: 82,
+    apy: 15.8,
+    status: "Available",
+    growthData: [7, 11, 14, 17, 19, 21.5]
+  },
+  {
+    id: "FARM-2024-005",
+    piCoreId: "PC-7894",
+    maxYield: 23.7,
+    health: "Excellent",
+    yieldScore: 88,
+    apy: 17.9,
+    status: "Full",
+    growthData: [9, 13, 16, 19, 22, 23.7]
+  },
+  {
+    id: "FARM-2024-006",
+    piCoreId: "PC-7895",
+    maxYield: 25.1,
+    health: "Excellent",
+    yieldScore: 91,
+    apy: 19.2,
+    status: "Available",
+    growthData: [11, 15, 18, 21, 24, 25.1]
+  },
+  {
+    id: "FARM-2024-007",
+    piCoreId: "PC-7896",
+    maxYield: 20.8,
+    health: "Good",
+    yieldScore: 79,
+    apy: 15.1,
+    status: "Available",
+    growthData: [6, 10, 13, 16, 18, 20.8]
+  },
+  {
+    id: "FARM-2024-008",
+    piCoreId: "PC-7897",
+    maxYield: 24.9,
+    health: "Excellent",
+    yieldScore: 93,
+    apy: 18.8,
+    status: "Full",
+    growthData: [10, 14, 17, 21, 23, 24.9]
+  },
+  {
+    id: "FARM-2024-009",
+    piCoreId: "PC-7898",
+    maxYield: 22.3,
+    health: "Good",
+    yieldScore: 84,
+    apy: 16.5,
+    status: "Available",
+    growthData: [8, 11, 14, 17, 20, 22.3]
+  },
+  {
+    id: "FARM-2024-010",
+    piCoreId: "PC-7899",
+    maxYield: 25.8,
+    health: "Excellent",
+    yieldScore: 96,
+    apy: 20.5,
+    status: "Available",
+    growthData: [12, 16, 19, 22, 24, 25.8]
+  }
 ];
 
 export default function StartStakePage() {
   const [expandedFarm, setExpandedFarm] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("yield");
+  const router = useRouter();
+
+  const handleStakeNow = (farm: any) => {
+    // Store the farm data in localStorage for the submit-stake page
+    localStorage.setItem('selectedFarm', JSON.stringify(farm));
+    router.push('/submit-stake');
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black relative">
@@ -203,7 +290,10 @@ export default function StartStakePage() {
                               </div>
                             </div>
 
-                            <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+                            <button 
+                              onClick={() => handleStakeNow(farm)}
+                              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
+                            >
                               Stake Now
                             </button>
                           </div>
