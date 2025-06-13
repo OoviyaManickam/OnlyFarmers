@@ -46,7 +46,7 @@ export default function HomePage() {
             
             <BoxReveal boxColor="#111" duration={0.8}>
               <p className="text-xl md:text-2xl lg:text-3xl text-zinc-400 font-space-grotesk tracking-wider relative">
-                BTCFi - AI - ZKP - CORE
+              Real Data. Real Farms. Real Stakes.
               </p>
             </BoxReveal>
             

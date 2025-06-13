@@ -20,14 +20,24 @@ const farms = [
     growthData: [10, 15, 18, 22, 25, 24.5]
   },
   {
-    id: "FARM-2024-002",
-    piCoreId: "PC-7891",
-    maxYield: 22.8,
-    health: "Good",
-    yieldScore: 85,
-    apy: 16.2,
+    id: "FARM-2024-008",
+    piCoreId: "PC-7897",
+    maxYield: 24.9,
+    health: "Excellent",
+    yieldScore: 93,
+    apy: 18.8,
     status: "Full",
-    growthData: [8, 12, 15, 18, 20, 22.8]
+    growthData: [10, 14, 17, 21, 23, 24.9]
+  },
+  {
+    id: "FARM-2024-009",
+    piCoreId: "PC-7898",
+    maxYield: 22.3,
+    health: "Good",
+    yieldScore: 84,
+    apy: 16.5,
+    status: "Available",
+    growthData: [8, 11, 14, 17, 20, 22.3]
   },
   {
     id: "FARM-2024-003",
@@ -80,24 +90,14 @@ const farms = [
     growthData: [6, 10, 13, 16, 18, 20.8]
   },
   {
-    id: "FARM-2024-008",
-    piCoreId: "PC-7897",
-    maxYield: 24.9,
-    health: "Excellent",
-    yieldScore: 93,
-    apy: 18.8,
-    status: "Full",
-    growthData: [10, 14, 17, 21, 23, 24.9]
-  },
-  {
-    id: "FARM-2024-009",
-    piCoreId: "PC-7898",
-    maxYield: 22.3,
+    id: "FARM-2024-002",
+    piCoreId: "PC-7891",
+    maxYield: 22.8,
     health: "Good",
-    yieldScore: 84,
-    apy: 16.5,
-    status: "Available",
-    growthData: [8, 11, 14, 17, 20, 22.3]
+    yieldScore: 85,
+    apy: 16.2,
+    status: "Full",
+    growthData: [8, 12, 15, 18, 20, 22.8]
   },
   {
     id: "FARM-2024-010",
