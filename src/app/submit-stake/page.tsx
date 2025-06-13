@@ -4,12 +4,31 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { ChartBarIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+
+// Token options with their icons and decimals
+const tokenOptions = [
+  { symbol: 'ETH', name: 'Ethereum', icon: '🔷', decimals: 18 },
+  { symbol: 'BTC', name: 'Bitcoin', icon: '₿', decimals: 8 },
+  { symbol: 'SOL', name: 'Solana', icon: '◎', decimals: 9 },
+  { symbol: 'USDT', name: 'Tether', icon: '💵', decimals: 6 },
+  { symbol: 'USDC', name: 'USD Coin', icon: '💲', decimals: 6 },
+  { symbol: 'BNB', name: 'Binance Coin', icon: '🔶', decimals: 18 },
+];
+
+const durationOptions = [
+  { value: '3', label: '3 Months', multiplier: 0.25 },
+  { value: '6', label: '6 Months', multiplier: 0.5 },
+  { value: '12', label: '1 Year', multiplier: 1 },
+];
 
 export default function SubmitStakePage() {
   const [selectedFarm, setSelectedFarm] = useState<any>(null);
   const [stakeAmount, setStakeAmount] = useState("");
+  const [selectedToken, setSelectedToken] = useState(tokenOptions[0]);
+  const [selectedDuration, setSelectedDuration] = useState(durationOptions[0]);
+  const [showTokenDropdown, setShowTokenDropdown] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,6 +39,18 @@ export default function SubmitStakePage() {
       router.push('/start-stake');
     }
   }, [router]);
+
+  const calculateReturns = (amount: string, duration: string) => {
+    if (!amount) return { annual: '0.00', total: '0.00' };
+    const numAmount = parseFloat(amount);
+    const annualYield = (numAmount * selectedFarm.apy) / 100;
+    const durationMultiplier = durationOptions.find(d => d.value === duration)?.multiplier || 1;
+    const totalYield = annualYield * durationMultiplier;
+    return {
+      annual: annualYield.toFixed(2),
+      total: totalYield.toFixed(2)
+    };
+  };
 
   if (!selectedFarm) {
     return null;
@@ -132,30 +163,92 @@ export default function SubmitStakePage() {
                 <h2 className="text-2xl font-bold text-white mb-6 font-space-grotesk">Staking Details</h2>
                 
                 <div className="space-y-6">
+                  {/* Token Selection */}
                   <div>
-                    <label className="block text-zinc-400 text-sm mb-2">Stake Amount</label>
-                    <input
-                      type="number"
-                      value={stakeAmount}
-                      onChange={(e) => setStakeAmount(e.target.value)}
-                      placeholder="Enter amount to stake"
-                      className="w-full px-4 py-3 bg-zinc-800/30 border border-zinc-700/50 rounded-xl text-zinc-300 placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors"
-                    />
+                    <label className="block text-zinc-400 text-sm mb-2">Select Token</label>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowTokenDropdown(!showTokenDropdown)}
+                        className="w-full px-4 py-3 bg-zinc-800/30 border border-zinc-700/50 rounded-xl text-zinc-300 flex items-center justify-between hover:border-blue-500/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{selectedToken.icon}</span>
+                          <span>{selectedToken.name} ({selectedToken.symbol})</span>
+                        </div>
+                        <ChevronDownIcon className="h-5 w-5" />
+                      </button>
+                      
+                      {showTokenDropdown && (
+                        <div className="absolute z-10 w-full mt-2 bg-zinc-900 border border-zinc-800 rounded-xl shadow-lg">
+                          {tokenOptions.map((token) => (
+                            <button
+                              key={token.symbol}
+                              onClick={() => {
+                                setSelectedToken(token);
+                                setShowTokenDropdown(false);
+                              }}
+                              className="w-full px-4 py-3 flex items-center gap-2 hover:bg-zinc-800/50 transition-colors"
+                            >
+                              <span className="text-xl">{token.icon}</span>
+                              <span className="text-zinc-300">{token.name} ({token.symbol})</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
+                  {/* Stake Amount */}
+                  <div>
+                    <label className="block text-zinc-400 text-sm mb-2">Stake Amount</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        placeholder="Enter amount to stake"
+                        className="w-full pl-4 pr-16 py-3 bg-zinc-800/30 border border-zinc-700/50 rounded-xl text-zinc-300 placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400">
+                        {selectedToken.symbol}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Duration Selection */}
+                  <div>
+                    <label className="block text-zinc-400 text-sm mb-2">Staking Duration</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {durationOptions.map((duration) => (
+                        <button
+                          key={duration.value}
+                          onClick={() => setSelectedDuration(duration)}
+                          className={`px-4 py-3 rounded-xl border transition-all duration-300 ${
+                            selectedDuration.value === duration.value
+                              ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
+                              : 'bg-zinc-800/30 border-zinc-700/50 text-zinc-300 hover:border-blue-500/50'
+                          }`}
+                        >
+                          {duration.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Estimated Returns */}
                   <div className="bg-zinc-800/30 p-4 rounded-xl">
                     <h3 className="text-lg font-semibold text-white mb-2">Estimated Returns</h3>
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-zinc-400">Annual Yield</span>
                         <span className="text-blue-500 font-semibold">
-                          {stakeAmount ? ((parseFloat(stakeAmount) * selectedFarm.apy) / 100).toFixed(2) : '0.00'} Pi
+                          {calculateReturns(stakeAmount, selectedDuration.value).annual} {selectedToken.symbol}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-zinc-400">Monthly Yield</span>
+                        <span className="text-zinc-400">Total Yield ({selectedDuration.label})</span>
                         <span className="text-cyan-500 font-semibold">
-                          {stakeAmount ? ((parseFloat(stakeAmount) * selectedFarm.apy) / 1200).toFixed(2) : '0.00'} Pi
+                          {calculateReturns(stakeAmount, selectedDuration.value).total} {selectedToken.symbol}
                         </span>
                       </div>
                     </div>
