@@ -47,7 +47,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-6 text-zinc-400 max-w-md">
-              Revolutionizing Bitcoin yield generation through decentralized farming and real-time data analytics.
+              Revolutionizing yield generation through decentralized farming and real time data analytics.
             </p>
             <div className="flex space-x-5">
               {socialLinks.map((item) => (
