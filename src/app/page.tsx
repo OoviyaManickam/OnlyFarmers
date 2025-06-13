@@ -95,9 +95,9 @@ export default function HomePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4 font-space-grotesk">PiAgent to make your life easier</h3>
+                  <h3 className="text-xl font-bold text-white mb-4 font-space-grotesk"> Stake on Real Farms, Not Just Tokens</h3>
                   <p className="text-zinc-400 font-space-grotesk leading-relaxed">
-                    Our PiAgent handles the Web3 complexity so you can focus on growing and earning!
+                    Our PiAgent handles the Web3 complexity so you can focus oForget speculative DeFi. With our platform, you stake directly on real-world farms using live sensor data, turning your crypto into a force for sustainable growth.n growing and earning!
                   </p>
                 </div>
               </div>
