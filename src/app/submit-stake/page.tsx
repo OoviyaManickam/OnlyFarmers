@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 
 // Token options with their icons and decimals
@@ -29,6 +29,7 @@ export default function SubmitStakePage() {
   const [selectedToken, setSelectedToken] = useState(tokenOptions[0]);
   const [selectedDuration, setSelectedDuration] = useState(durationOptions[0]);
   const [showTokenDropdown, setShowTokenDropdown] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,6 +53,13 @@ export default function SubmitStakePage() {
     };
   };
 
+  const handleConfirmStake = () => {
+    setShowSuccess(true);
+    setTimeout(() => {
+      router.push('/start-stake');
+    }, 2000);
+  };
+
   if (!selectedFarm) {
     return null;
   }
@@ -62,8 +70,8 @@ export default function SubmitStakePage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-cyan-900/10 via-black/0 to-transparent"></div>
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
-        <div className="container mx-auto px-6 lg:px-8 pb-20 pt-5 flex-grow">
-          <div className="pt-15 lg:pt-40">
+        <div className="container mx-auto px-6 lg:px-8 pb-20  flex-grow">
+          <div className="pt-10 lg:pt-35">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -89,7 +97,7 @@ export default function SubmitStakePage() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="bg-gradient-to-br from-zinc-900/50 to-black p-6 rounded-2xl border border-zinc-800/50"
               >
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-xl font-bold text-white font-space-grotesk">{selectedFarm.id}</h3>
                     <p className="text-zinc-400 text-sm">PiCore ID: {selectedFarm.piCoreId}</p>
@@ -103,7 +111,7 @@ export default function SubmitStakePage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Max Yield</p>
                     <p className="text-xl font-bold text-blue-500">{selectedFarm.maxYield}%</p>
@@ -114,7 +122,7 @@ export default function SubmitStakePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Yield Score</p>
                     <p className="text-xl font-bold text-purple-500">{selectedFarm.yieldScore}</p>
@@ -126,7 +134,7 @@ export default function SubmitStakePage() {
                 </div>
 
                 {/* Growth Graph */}
-                <div className="bg-zinc-800/30 p-4 rounded-xl">
+                <div className="bg-zinc-800/30 p-4 rounded-xl mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-zinc-400 text-sm">Growth Trend</p>
                     <ChartBarIcon className="h-5 w-5 text-blue-500" />
@@ -149,6 +157,29 @@ export default function SubmitStakePage() {
                         </linearGradient>
                       </defs>
                     </svg>
+                  </div>
+                </div>
+
+                {/* Additional Farm Information */}
+                <div className="bg-zinc-800/30 p-4 rounded-xl">
+                  <h3 className="text-lg font-semibold text-white mb-3">Farm Details</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Minimum Stake</span>
+                      <span className="text-zinc-300">100 {selectedToken.symbol}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Maximum Stake</span>
+                      <span className="text-zinc-300">10,000 {selectedToken.symbol}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Lock Period</span>
+                      <span className="text-zinc-300">30 days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Withdrawal Fee</span>
+                      <span className="text-zinc-300">0.5%</span>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -261,13 +292,35 @@ export default function SubmitStakePage() {
                     <ArrowLeftIcon className="h-5 w-5" />
                     Back to Farms
                   </button>
-
-                  <button 
-                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
-                  >
-                    Confirm Stake
-                  </button>
                 </div>
+
+                <AnimatePresence>
+                  {showSuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+                    >
+                      <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800/50 max-w-md w-full mx-4">
+                        <div className="flex flex-col items-center text-center">
+                          <CheckCircleIcon className="h-16 w-16 text-green-500 mb-4" />
+                          <h3 className="text-2xl font-bold text-white mb-2">Success!</h3>
+                          <p className="text-zinc-400">
+                            {stakeAmount} {selectedToken.symbol} successfully staked for {selectedDuration.label}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <button 
+                  onClick={handleConfirmStake}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
+                >
+                  Confirm Stake
+                </button>
               </motion.div>
             </div>
           </div>
