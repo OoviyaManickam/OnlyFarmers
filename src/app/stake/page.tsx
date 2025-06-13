@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
+import Link from 'next/link';
 
 export default function StakePage() {
   return (
@@ -29,10 +30,20 @@ export default function StakePage() {
               <p className="text-lg md:text-xl text-zinc-400 leading-relaxed font-space-grotesk tracking-wider">
                 Turning real-time farm data into smart investments - where crops grow, profits flow, and Web3 complexity stays out of sight!
               </p>
+              <Link href="/start-stake">
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="mt-8 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide"
+                >
+                  Start Staking
+                </motion.button>
+              </Link>
             </motion.div>
 
             {/* Feature Boxes */}
-            <div className="grid md:grid-cols-2 gap-8 mt-20">
+            <div className="grid md:grid-cols-2 gap-8 mt-15">
               {/* Stake and Yield Box */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
