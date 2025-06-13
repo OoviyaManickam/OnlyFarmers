@@ -57,7 +57,7 @@ export default function SubmitStakePage() {
     setShowSuccess(true);
     setTimeout(() => {
       router.push('/start-stake');
-    }, 2000);
+    }, 5000);
   };
 
   if (!selectedFarm) {
@@ -287,40 +287,41 @@ export default function SubmitStakePage() {
 
                   <button 
                     onClick={() => router.push('/start-stake')}
-                    className="w-full py-3 px-4 bg-zinc-800/30 border border-zinc-700/50 text-zinc-300 rounded-xl text-lg font-semibold transition-all duration-300 hover:border-blue-500/50 flex items-center justify-center gap-2"
+                    className="w-full py-3 px-4 bg-zinc-800/30 border border-zinc-700/50 text-zinc-300 rounded-xl text-lg font-semibold transition-all duration-300 hover:border-blue-500/50 flex items-center justify-center gap-2 mb-6"
                   >
                     <ArrowLeftIcon className="h-5 w-5" />
                     Back to Farms
                   </button>
-                </div>
 
-                <AnimatePresence>
-                  {showSuccess && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
-                    >
-                      <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800/50 max-w-md w-full mx-4">
-                        <div className="flex flex-col items-center text-center">
-                          <CheckCircleIcon className="h-16 w-16 text-green-500 mb-4" />
-                          <h3 className="text-2xl font-bold text-white mb-2">Success!</h3>
-                          <p className="text-zinc-400">
-                            {stakeAmount} {selectedToken.symbol} successfully staked for {selectedDuration.label}
-                          </p>
+                  <AnimatePresence>
+                    {showSuccess && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+                      >
+                        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800/50 max-w-md w-full mx-4">
+                          <div className="flex flex-col items-center text-center">
+                            <CheckCircleIcon className="h-16 w-16 text-green-500 mb-4" />
+                            <h3 className="text-2xl font-bold text-white mb-2">Success!</h3>
+                            <p className="text-zinc-400">
+                              {stakeAmount} {selectedToken.symbol} successfully staked for {selectedDuration.label}
+                            </p>
+                            {/* <p className="text-zinc-500 text-sm mt-2">Redirecting in 10 seconds...</p> */}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-                <button 
-                  onClick={handleConfirmStake}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
-                >
-                  Confirm Stake
-                </button>
+                  <button 
+                    onClick={handleConfirmStake}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
+                  >
+                    Confirm Stake
+                  </button>
+                </div>
               </motion.div>
             </div>
           </div>
