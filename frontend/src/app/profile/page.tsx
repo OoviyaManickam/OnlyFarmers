@@ -66,16 +66,15 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="min-h-screen bg-black relative overflow-x-hidden">
+    <main className="min-h-screen  relative overflow-x-hidden">
       {/* Visible neon background effects */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         {/* Large neon gradients */}
-        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-gradient-to-br from-blue-600 via-cyan-400 to-purple-600 opacity-60 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[-200px] left-[-200px] w-[300px] h-[600px] bg-gradient-to-br from-blue-600 via-cyan-400 to-purple-600 opacity-30 rounded-full blur-[120px]"></div>
         <div className="absolute bottom-[-180px] right-[-180px] w-[500px] h-[500px] bg-gradient-to-tr from-purple-600 via-blue-500 to-cyan-400 opacity-50 rounded-full blur-[100px]"></div>
-        {/* Neon grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,255,255,0.08)_1px,transparent_1px),linear-gradient(180deg,rgba(0,255,255,0.08)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+       
         {/* Subtle center glow */}
-        <div className="absolute left-1/2 top-1/3 -translate-x-1/2 w-[700px] h-[200px] bg-gradient-to-r from-blue-500/30 via-cyan-400/20 to-purple-500/30 rounded-full blur-2xl opacity-70"></div>
+        <div className="absolute left-1/2 top-1/4 -translate-x-1/2 w-[600px] h-[200px] bg-gradient-to-r from-blue-500/30 via-cyan-400/20 to-purple-500/30 rounded-full blur-2xl opacity-50"></div>
       </div>
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
