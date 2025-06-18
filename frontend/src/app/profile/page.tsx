@@ -43,7 +43,7 @@ const dummyStakes = [
       yieldScore: 88,
       maxYield: 10,
       lockPeriod: '90 days',
-      withdrawalFee: '0.5%',
+      withdrawalFee: '10.0%',
     },
   },
 ];
