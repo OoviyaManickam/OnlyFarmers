@@ -1,6 +1,6 @@
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { BoxReveal } from '@/components/magicui/box-reveal';
+import { FlipText } from '@/components/magicui/flip-text';
 import { TypingAnimation } from '@/components/magicui/typing-animation';
 import { CardContainer, CardBody, CardItem } from '@/components/ui/3d-card';
 
@@ -38,32 +38,30 @@ export default function HomePage() {
               <div className="absolute bottom-20 left-1/4 w-24 h-24 border border-purple-500/20 transform rotate-12 animate-float-slower"></div>
             </div>
 
-            <BoxReveal boxColor="#000" duration={0.7}>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text font-space-grotesk relative">
+            <h1>
+            <FlipText
+                duration={0.5}
+                delayMultiple={0.08}
+                className="text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text font-space-grotesk relative"
+              >
                 OnlyFarmers
-              </h1>
-            </BoxReveal>
+              </FlipText>
+            </h1>
             
-            <BoxReveal boxColor="#111" duration={0.8}>
-              <p className="text-xl md:text-2xl lg:text-3xl text-zinc-400 font-space-grotesk tracking-wider relative">
+            <p className="text-xl md:text-2xl lg:text-3xl text-zinc-400 font-space-grotesk tracking-wider relative">
               Real Data. Real Farms. Real Stakes.
-              </p>
-            </BoxReveal>
+            </p>
             
-            <BoxReveal boxColor="#222" duration={0.9} width="100%">
-              <p className="max-w-3xl mx-auto text-lg md:text-xl text-zinc-300 leading-relaxed font-space-grotesk relative">
-                Powered by DePIN to Farm. Stake. Earn. No Hassle. 
-                <span className="block mt-2">
-                  Turning real-time farm data into smart investments - where crops grow, profits flow, and Web3 complexity stays out of sight!
-                </span>
-              </p>
-            </BoxReveal>
+            <p className="max-w-3xl mx-auto text-lg md:text-xl text-zinc-300 leading-relaxed font-space-grotesk relative">
+              Powered by DePIN to Farm. Stake. Earn. No Hassle. 
+              <span className="block mt-2">
+                Turning real-time farm data into smart investments - where crops grow, profits flow, and Web3 complexity stays out of sight!
+              </span>
+            </p>
             
-            <BoxReveal boxColor="#000" duration={1}>
-              <button className="mt-4 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide relative">
-                Get Started
-              </button>
-            </BoxReveal>
+            <button className="mt-4 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide relative">
+              Get Started
+            </button>
           </div>
 
           <div className="py-20 ">
