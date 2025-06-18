@@ -63,7 +63,7 @@ export default function ProfilePage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-cyan-900/10 via-black/0 to-transparent"></div>
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
-        <div className="container mx-auto px-6 lg:px-8 pb-20 flex-grow">
+        <div className="container mx-auto px-6 lg:px-8 pb-20 pt-18 flex-grow">
           <div className="pt-10 max-w-3xl mx-auto">
             <div className="bg-black/60 border border-zinc-800/60 rounded-2xl p-8 mb-10 shadow-xl">
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text mb-2 font-space-grotesk">Hello</h1>
