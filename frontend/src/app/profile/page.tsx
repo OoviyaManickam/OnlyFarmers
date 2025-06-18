@@ -66,7 +66,7 @@ export default function ProfilePage() {
         <div className="container mx-auto px-6 lg:px-8 pb-20 flex-grow">
           <div className="pt-10 max-w-3xl mx-auto">
             <div className="bg-black/60 border border-zinc-800/60 rounded-2xl p-8 mb-10 shadow-xl">
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text mb-2 font-space-grotesk">Profile</h1>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text mb-2 font-space-grotesk">Hello</h1>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <div className="text-zinc-400 text-sm">Wallet Address</div>
