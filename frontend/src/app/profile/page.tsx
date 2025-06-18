@@ -5,6 +5,9 @@ import Footer from '@/components/footer';
 import { useState } from 'react';
 
 const dummyWallet = '0x1234...ABCD5678';
+const dummyProfile = {
+  joined: '2024-05-01',
+};
 const dummyStakes = [
   {
     id: 'stake1',
@@ -57,28 +60,48 @@ export default function ProfilePage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [withdrawStake, setWithdrawStake] = useState<string | null>(null);
 
+  // Dummy logout handler
+  const handleLogout = () => {
+    alert('Logged out!');
+  };
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-black/0 to-transparent"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-cyan-900/10 via-black/0 to-transparent"></div>
+    <main className="min-h-screen bg-black relative overflow-x-hidden">
+      {/* Visible neon background effects */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        {/* Large neon gradients */}
+        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-gradient-to-br from-blue-600 via-cyan-400 to-purple-600 opacity-60 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-180px] right-[-180px] w-[500px] h-[500px] bg-gradient-to-tr from-purple-600 via-blue-500 to-cyan-400 opacity-50 rounded-full blur-[100px]"></div>
+        {/* Neon grid overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,255,255,0.08)_1px,transparent_1px),linear-gradient(180deg,rgba(0,255,255,0.08)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
+        {/* Subtle center glow */}
+        <div className="absolute left-1/2 top-1/3 -translate-x-1/2 w-[700px] h-[200px] bg-gradient-to-r from-blue-500/30 via-cyan-400/20 to-purple-500/30 rounded-full blur-2xl opacity-70"></div>
+      </div>
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
         <div className="container mx-auto px-6 lg:px-8 pb-20 pt-18 flex-grow">
           <div className="pt-10 max-w-3xl mx-auto">
-            <div className="bg-black/60 border border-zinc-800/60 rounded-2xl p-8 mb-10 shadow-xl">
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 via-cyan-600 to-purple-500 text-transparent bg-clip-text mb-2 font-space-grotesk">Hello</h1>
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <div className="text-zinc-400 text-sm">Wallet Address</div>
-                  <div className="font-mono text-lg text-blue-400">{dummyWallet}</div>
+            {/* Profile Card - new style, no avatar, just Hello! and info */}
+            <div className="bg-gradient-to-br from-blue-900/70 via-black/80 to-purple-900/60 border-2 border-blue-700/30 rounded-3xl p-8 mb-10 shadow-2xl flex flex-col md:flex-row md:items-center gap-8 relative overflow-hidden">
+              <div className="flex-1">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl md:text-4xl font-bold text-white font-space-grotesk">Hello!</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1 text-zinc-400 text-sm md:text-right">
-                  <div>Joined: <span className="text-zinc-200">2024-05-01</span></div>
-                  <div>Total Staked: <span className="text-blue-400 font-semibold">{dummyStakes.reduce((a, s) => a + s.amount, 0)} </span></div>
+                <div className="text-zinc-400 text-sm mt-2">Wallet Address</div>
+                <div className="font-mono text-lg text-blue-300 bg-zinc-900/60 px-2 py-1 rounded-lg inline-block mt-1 border border-blue-700/40">
+                  {dummyWallet}
+                </div>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mt-4">
+                  <div className="text-zinc-400 text-sm">Joined: <span className="text-zinc-200">{dummyProfile.joined}</span></div>
+                  <div className="text-zinc-400 text-sm">Total Staked: <span className="text-blue-300 font-semibold">{dummyStakes.reduce((a, s) => a + s.amount, 0)}</span></div>
+                  <button onClick={handleLogout} className="px-6 py-2 bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all border-2 border-blue-700/30 mt-2 md:mt-0">Logout</button>
                 </div>
               </div>
             </div>
 
+            {/* Stakes Dashboard */}
             <div className="bg-black/60 border border-zinc-800/60 rounded-2xl p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-white mb-6 font-space-grotesk">Your Stakes</h2>
               <div className="space-y-4">
