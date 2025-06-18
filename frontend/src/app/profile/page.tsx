@@ -80,7 +80,7 @@ export default function ProfilePage() {
       <div className="relative flex flex-col min-h-screen">
         <Navbar />
         <div className="container mx-auto px-6 lg:px-8 pb-20 pt-18 flex-grow">
-          <div className="pt-10 max-w-3xl mx-auto">
+          <div className="pt-20 max-w-3xl mx-auto">
             {/* Profile Card - new style, no avatar, just Hello! and info */}
             <div className="bg-gradient-to-br from-blue-900/70 via-black/80 to-purple-900/60 border-2 border-blue-700/30 rounded-3xl p-8 mb-10 shadow-2xl flex flex-col md:flex-row md:items-center gap-8 relative overflow-hidden">
               <div className="flex-1">
