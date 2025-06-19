@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { cn } from '@/lib/utils';
+import { createWalletClient, custom } from 'viem';
 
 const navigation = [
   { name: 'Stake', href: '/stake' },
@@ -14,12 +13,40 @@ const navigation = [
 ];
 
 export default function Navbar() {
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [connecting, setConnecting] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Sync wallet from localStorage for persistence
+    if (typeof window !== 'undefined') {
+      const addr = localStorage.getItem('connectedWallet');
+      if (addr) setWallet(addr);
+    }
   }, []);
+
+  const connectWallet = async () => {
+    setConnecting(true);
+    try {
+      if (typeof window === 'undefined' || !window.ethereum) {
+        alert('Please install MetaMask or a compatible wallet.');
+        setConnecting(false);
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const walletClient = createWalletClient({
+        transport: custom(window.ethereum as any),
+      });
+      const [account] = await walletClient.getAddresses();
+      setWallet(account);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('connectedWallet', account);
+      }
+    } catch {
+      alert('Failed to connect wallet.');
+    } finally {
+      setConnecting(false);
+    }
+  };
 
   return (
     <Disclosure as="nav" className="fixed w-full z-50 top-4 px-4">
@@ -49,9 +76,19 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   ))}
-                    <button className="ml-2 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black px-6 py-2.5 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide">
-                    Connect Wallet
-                  </button>
+                  {wallet ? (
+                    <span className="ml-2 bg-zinc-800/60 text-blue-400 px-6 py-2.5 rounded-full text-lg font-semibold font-mono border border-blue-500/30">
+                      {wallet.slice(0, 6)}...{wallet.slice(-4)}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={connectWallet}
+                      disabled={connecting}
+                      className="ml-2 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black px-6 py-2.5 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {connecting ? 'Connecting...' : 'Connect Wallet'}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -84,9 +121,19 @@ export default function Navbar() {
                   {item.name}
                 </Disclosure.Button>
               ))}
-                <button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black px-4 py-3 text-lg font-semibold transition-all duration-200 font-space-grotesk rounded-xl">
-                Connect Wallet
-              </button>
+                {wallet ? (
+                  <span className="w-full mt-4 bg-zinc-800/60 text-blue-400 px-4 py-3 text-lg font-semibold font-mono border border-blue-500/30 rounded-xl block text-center">
+                    {wallet.slice(0, 6)}...{wallet.slice(-4)}
+                  </span>
+                ) : (
+                  <button
+                    onClick={connectWallet}
+                    disabled={connecting}
+                    className="w-full mt-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black px-4 py-3 text-lg font-semibold transition-all duration-200 font-space-grotesk rounded-xl disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {connecting ? 'Connecting...' : 'Connect Wallet'}
+                  </button>
+                )}
               </div>
             </div>
           </Disclosure.Panel>

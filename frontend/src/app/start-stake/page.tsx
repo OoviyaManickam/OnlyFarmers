@@ -1,127 +1,112 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPublicClient, http } from 'viem';
+import { mantleSepoliaTestnet } from 'viem/chains';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { MagnifyingGlassIcon, FunnelIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { Contract_ABI, Contract_Address } from '@/components/abi';
 
-// Mock data for farms
-const farms = [
-  {
-    id: "FARM-2024-001",
-    piCoreId: "PC-7890",
-    maxYield: 24.5,
-    health: "Excellent",
-    yieldScore: 92,
-    apy: 18.5,
-    status: "Available",
-    growthData: [10, 15, 18, 22, 25, 24.5]
-  },
-  {
-    id: "FARM-2024-008",
-    piCoreId: "PC-7897",
-    maxYield: 24.9,
-    health: "Excellent",
-    yieldScore: 93,
-    apy: 18.8,
-    status: "Full",
-    growthData: [10, 14, 17, 21, 23, 24.9]
-  },
-  {
-    id: "FARM-2024-009",
-    piCoreId: "PC-7898",
-    maxYield: 22.3,
-    health: "Good",
-    yieldScore: 84,
-    apy: 16.5,
-    status: "Available",
-    growthData: [8, 11, 14, 17, 20, 22.3]
-  },
-  {
-    id: "FARM-2024-003",
-    piCoreId: "PC-7892",
-    maxYield: 26.3,
-    health: "Excellent",
-    yieldScore: 95,
-    apy: 20.1,
-    status: "Available",
-    growthData: [12, 16, 20, 23, 25, 26.3]
-  },
-  {
-    id: "FARM-2024-004",
-    piCoreId: "PC-7893",
-    maxYield: 21.5,
-    health: "Good",
-    yieldScore: 82,
-    apy: 15.8,
-    status: "Available",
-    growthData: [7, 11, 14, 17, 19, 21.5]
-  },
-  {
-    id: "FARM-2024-005",
-    piCoreId: "PC-7894",
-    maxYield: 23.7,
-    health: "Excellent",
-    yieldScore: 88,
-    apy: 17.9,
-    status: "Full",
-    growthData: [9, 13, 16, 19, 22, 23.7]
-  },
-  {
-    id: "FARM-2024-006",
-    piCoreId: "PC-7895",
-    maxYield: 25.1,
-    health: "Excellent",
-    yieldScore: 91,
-    apy: 19.2,
-    status: "Available",
-    growthData: [11, 15, 18, 21, 24, 25.1]
-  },
-  {
-    id: "FARM-2024-007",
-    piCoreId: "PC-7896",
-    maxYield: 20.8,
-    health: "Good",
-    yieldScore: 79,
-    apy: 15.1,
-    status: "Available",
-    growthData: [6, 10, 13, 16, 18, 20.8]
-  },
-  {
-    id: "FARM-2024-002",
-    piCoreId: "PC-7891",
-    maxYield: 22.8,
-    health: "Good",
-    yieldScore: 85,
-    apy: 16.2,
-    status: "Full",
-    growthData: [8, 12, 15, 18, 20, 22.8]
-  },
-  {
-    id: "FARM-2024-010",
-    piCoreId: "PC-7899",
-    maxYield: 25.8,
-    health: "Excellent",
-    yieldScore: 96,
-    apy: 20.5,
-    status: "Available",
-    growthData: [12, 16, 19, 22, 24, 25.8]
-  }
+// You can change 'mainnet' to your target chain, or use a custom RPC URL
+const publicClient = createPublicClient({
+  chain: mantleSepoliaTestnet,
+  transport: http(),
+});
+
+// Dummy graph data for UI
+const dummyGrowthData = [
+  [10, 15, 18, 22, 25, 24.5],
+  [10, 14, 17, 21, 23, 24.9],
+  [8, 11, 14, 17, 20, 22.3],
+  [12, 16, 20, 23, 25, 26.3],
+  [7, 11, 14, 17, 19, 21.5],
+  [9, 13, 16, 19, 22, 23.7],
+  [11, 15, 18, 21, 24, 25.1],
+  [6, 10, 13, 16, 18, 20.8],
+  [8, 12, 15, 18, 20, 22.8],
+  [12, 16, 19, 22, 24, 25.8],
 ];
 
+type Farm = {
+  id: string;
+  piCoreId: string;
+  maxYield: number;
+  health: string;
+  yieldScore: number;
+  apy: number;
+  status: string;
+  growthData: number[];
+};
+
+type ContractFarm = {
+  id: bigint;
+  name: string;
+  piId: string;
+  health: bigint;
+  apy: bigint;
+  owner: string;
+};
+
 export default function StartStakePage() {
+  const [farms, setFarms] = useState<Farm[]>([]);
   const [expandedFarm, setExpandedFarm] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("yield");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const handleStakeNow = (farm: any) => {
+  useEffect(() => {
+    const fetchFarms = async () => {
+      setIsLoading(true);
+      setIsError(false);
+      try {
+        const data = await publicClient.readContract({
+          address: Contract_Address,
+          abi: Contract_ABI,
+          functionName: 'getAllFarms',
+        });
+        if (data && Array.isArray(data)) {
+          setFarms(
+            (data as ContractFarm[]).map((farm, idx: number) => ({
+              id: `FARM-${farm.id.toString()}`,
+              piCoreId: farm.piId,
+              health: Number(farm.health) > 80 ? "Excellent" : Number(farm.health) > 60 ? "Good" : "Average",
+              apy: Number(farm.apy),
+              status: "Available",
+              maxYield: Number(farm.apy),
+              yieldScore: Number(farm.health),
+              growthData: dummyGrowthData[idx % dummyGrowthData.length],
+            }))
+          );
+        }
+        setIsLoading(false);
+      } catch {
+        setIsError(true);
+        setIsLoading(false);
+      }
+    };
+    fetchFarms();
+  }, []);
+
+  const handleStakeNow = (farm: Farm) => {
     // Store the farm data in localStorage for the submit-stake page
     localStorage.setItem('selectedFarm', JSON.stringify(farm));
     router.push('/submit-stake');
   };
+
+  // Filter and sort logic (optional, can be improved)
+  let displayedFarms = farms.filter(farm =>
+    farm.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  if (sortBy === "yield") {
+    displayedFarms = [...displayedFarms].sort((a, b) => b.apy - a.apy);
+  } else if (sortBy === "health") {
+    displayedFarms = [...displayedFarms].sort((a, b) => b.yieldScore - a.yieldScore);
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-zinc-900 to-black relative">
@@ -197,9 +182,13 @@ export default function StartStakePage() {
               </div>
             </motion.div>
 
+            {/* Loading/Error UI */}
+            {isLoading && <div className="text-center text-zinc-400">Loading farms...</div>}
+            {isError && <div className="text-center text-red-400">Failed to load farms.</div>}
+
             {/* Farm Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {farms.map((farm, index) => (
+              {displayedFarms.map((farm, index) => (
                 <motion.div
                   key={farm.id}
                   initial={{ opacity: 0, y: 20 }}

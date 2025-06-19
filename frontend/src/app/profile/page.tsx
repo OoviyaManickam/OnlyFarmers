@@ -2,67 +2,115 @@
 
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createWalletClient, custom, createPublicClient, http } from 'viem';
+import { Contract_ABI, Contract_Address } from '@/components/abi';
+import { mantleSepoliaTestnet } from 'viem/chains';
 
-const dummyWallet = '0x1234...ABCD5678';
-const dummyProfile = {
-  joined: '2024-05-01',
-};
-const dummyStakes = [
-  {
-    id: 'stake1',
-    farm: 'Farm #101',
-    token: 'ETH',
-    amount: 2.5,
-    apy: 12.5,
-    status: 'Active',
-    date: '2024-06-01T14:30:00Z',
-    duration: '6 Months',
-    yield: 0.8,
-    penalty: 10,
-    details: {
-      piCoreId: 'PC-101',
-      health: 'Good',
-      yieldScore: 92,
-      maxYield: 15,
-      lockPeriod: '180 days',
-      withdrawalFee: '10.0%',
-    },
-  },
-  {
-    id: 'stake2',
-    farm: 'Farm #202',
-    token: 'USDT',
-    amount: 1000,
-    apy: 8.2,
-    status: 'Active',
-    date: '2024-05-15T09:00:00Z',
-    duration: '3 Months',
-    yield: 20,
-    penalty: 10,
-    details: {
-      piCoreId: 'PC-202',
-      health: 'Excellent',
-      yieldScore: 88,
-      maxYield: 10,
-      lockPeriod: '90 days',
-      withdrawalFee: '10.0%',
-    },
-  },
-];
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleString();
+declare global {
+  interface Window {
+    ethereum?: unknown;
+  }
 }
 
-export default function ProfilePage() {
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [withdrawStake, setWithdrawStake] = useState<string | null>(null);
+type StakeInfo = {
+  farmId: bigint;
+  amount: bigint;
+  startTime: bigint;
+  duration: bigint;
+  withdrawn: boolean;
+};
 
-  // Dummy logout handler
-  const handleLogout = () => {
-    alert('Logged out!');
+export default function ProfilePage() {
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [withdrawStake, setWithdrawStake] = useState<number | null>(null);
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [stakes, setStakes] = useState<StakeInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
+
+  // Connect wallet and fetch stakes
+  useEffect(() => {
+    const fetchStakes = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        if (typeof window === 'undefined' || !window.ethereum) {
+          setError('Please connect your wallet.');
+          setIsLoading(false);
+          return;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const walletClient = createWalletClient({
+          chain: mantleSepoliaTestnet,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          transport: custom(window.ethereum as any),
+        });
+        const [account] = await walletClient.getAddresses();
+        setWallet(account);
+        const publicClient = createPublicClient({
+          chain: mantleSepoliaTestnet,
+          transport: http(),
+        });
+        const data = await publicClient.readContract({
+          address: Contract_Address,
+          abi: Contract_ABI,
+          functionName: 'getUserStakeInfo',
+          args: [account],
+        });
+        setStakes(data as StakeInfo[]);
+      } catch (err) {
+        if (typeof err === 'object' && err && 'message' in err) {
+          setError((err as { message?: string }).message || 'Failed to fetch stakes.');
+        } else {
+          setError('Failed to fetch stakes.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStakes();
+  }, []);
+
+  const handleWithdraw = async (index: number) => {
+    setWithdrawing(true);
+    setError(null);
+    setTxHash(null);
+    try {
+      if (typeof window === 'undefined' || !window.ethereum) {
+        setError('Please connect your wallet.');
+        setWithdrawing(false);
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const walletClient = createWalletClient({
+        chain: mantleSepoliaTestnet,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        transport: custom(window.ethereum as any),
+      });
+      const [account] = await walletClient.getAddresses();
+      const hash = await walletClient.writeContract({
+        address: Contract_Address,
+        abi: Contract_ABI,
+        functionName: 'withdraw',
+        args: [BigInt(index)],
+        account,
+        chain: mantleSepoliaTestnet,
+      });
+      setTxHash(hash);
+      setWithdrawStake(null);
+      // Optionally, refetch stakes after withdrawal
+    } catch (err) {
+      if (typeof err === 'object' && err && 'message' in err) {
+        setError((err as { message?: string }).message || 'Withdraw failed.');
+      } else {
+        setError('Withdraw failed.');
+      }
+    } finally {
+      setWithdrawing(false);
+    }
   };
 
   return (
@@ -93,12 +141,10 @@ export default function ProfilePage() {
                 </div>
                 <div className="text-zinc-400 text-sm mt-2">Wallet Address</div>
                 <div className="font-mono text-lg text-blue-300 bg-zinc-900/60 px-2 py-1 rounded-lg inline-block mt-1 border border-blue-700/40">
-                  {dummyWallet}
+                  {wallet ? wallet : 'Not connected'}
                 </div>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mt-4">
-                  <div className="text-zinc-400 text-sm">Joined: <span className="text-zinc-200">{dummyProfile.joined}</span></div>
-                  <div className="text-zinc-400 text-sm">Total Staked: <span className="text-blue-300 font-semibold">{dummyStakes.reduce((a, s) => a + s.amount, 0)}</span></div>
-                  <button onClick={handleLogout} className="px-6 py-2 bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all border-2 border-blue-700/30 mt-2 md:mt-0">Logout</button>
+                  <div className="text-zinc-400 text-sm">Total Stakes: <span className="text-blue-300 font-semibold">{stakes.length}</span></div>
                 </div>
               </div>
             </div>
@@ -106,60 +152,44 @@ export default function ProfilePage() {
             {/* Stakes Dashboard */}
             <div className="bg-black/60 border border-zinc-800/60 rounded-2xl p-8 shadow-xl">
               <h2 className="text-2xl font-bold text-white mb-6 font-space-grotesk">Your Stakes</h2>
+              {isLoading && <div className="text-zinc-400 text-center">Loading stakes...</div>}
+              {error && <div className="text-red-500 text-center">{error}</div>}
               <div className="space-y-4">
-                {dummyStakes.map((stake) => (
-                  <div key={stake.id} className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 cursor-pointer" onClick={() => setExpanded(expanded === stake.id ? null : stake.id)}>
+                {stakes.map((stake, idx) => (
+                  <div key={idx} className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 cursor-pointer" onClick={() => setExpanded(expanded === idx ? null : idx)}>
                       <div className="flex items-center gap-4">
-                        <span className="text-2xl">{stake.token === 'ETH' ? '🔷' : stake.token === 'USDT' ? '💵' : '🪙'}</span>
+                        <span className="text-2xl">🪙</span>
                         <div>
-                          <div className="font-semibold text-white">{stake.farm}</div>
-                          <div className="text-zinc-400 text-xs">{stake.token} • {stake.amount} • {stake.status}</div>
+                          <div className="font-semibold text-white">Farm #{stake.farmId.toString()}</div>
+                          <div className="text-zinc-400 text-xs">Amount: {Number(stake.amount) / 1e18} ETH • {stake.withdrawn ? 'Withdrawn' : 'Active'}</div>
                         </div>
                       </div>
-                      <div className="text-zinc-400 text-xs md:text-sm">{formatDate(stake.date)}</div>
+                      <div className="text-zinc-400 text-xs md:text-sm">Start: {new Date(Number(stake.startTime) * 1000).toLocaleString()}</div>
                     </div>
-                    {expanded === stake.id && (
+                    {expanded === idx && (
                       <div className="mt-4 border-t border-zinc-800 pt-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
-                            <div className="text-zinc-400 text-xs">APY</div>
-                            <div className="text-blue-400 font-semibold">{stake.apy}%</div>
-                          </div>
-                          <div>
                             <div className="text-zinc-400 text-xs">Duration</div>
-                            <div className="text-zinc-200">{stake.duration}</div>
+                            <div className="text-zinc-200">{Number(stake.duration) / (60 * 60 * 24)} days</div>
                           </div>
                           <div>
-                            <div className="text-zinc-400 text-xs">Yield Score</div>
-                            <div className="text-purple-400 font-semibold">{stake.details.yieldScore}</div>
-                          </div>
-                          <div>
-                            <div className="text-zinc-400 text-xs">Farm Health</div>
-                            <div className="text-cyan-400 font-semibold">{stake.details.health}</div>
-                          </div>
-                          <div>
-                            <div className="text-zinc-400 text-xs">Max Yield</div>
-                            <div className="text-blue-400 font-semibold">{stake.details.maxYield}%</div>
-                          </div>
-                          <div>
-                            <div className="text-zinc-400 text-xs">Lock Period</div>
-                            <div className="text-zinc-200">{stake.details.lockPeriod}</div>
-                          </div>
-                          <div>
-                            <div className="text-zinc-400 text-xs">Withdrawal Fee</div>
-                            <div className="text-zinc-200">{stake.details.withdrawalFee}</div>
+                            <div className="text-zinc-400 text-xs">Withdrawn</div>
+                            <div className="text-cyan-400 font-semibold">{stake.withdrawn ? 'Yes' : 'No'}</div>
                           </div>
                         </div>
                         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                          <div className="text-zinc-400 text-xs">Staked on: <span className="text-zinc-200">{formatDate(stake.date)}</span></div>
-                          <button onClick={() => setWithdrawStake(stake.id)} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-all">Withdraw</button>
+                          <div className="text-zinc-400 text-xs">Staked on: <span className="text-zinc-200">{new Date(Number(stake.startTime) * 1000).toLocaleString()}</span></div>
+                          {!stake.withdrawn && (
+                            <button onClick={() => setWithdrawStake(idx)} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-all">Withdraw</button>
+                          )}
                         </div>
                       </div>
                     )}
                   </div>
                 ))}
-                {dummyStakes.length === 0 && (
+                {stakes.length === 0 && !isLoading && (
                   <div className="text-zinc-400 text-center py-8">No stakes found.</div>
                 )}
               </div>
@@ -170,13 +200,23 @@ export default function ProfilePage() {
       </div>
 
       {/* Withdraw Modal */}
-      {withdrawStake && (
+      {withdrawStake !== null && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
             <div className="text-2xl text-red-500 font-bold mb-2">Warning!</div>
             <div className="text-zinc-300 mb-4">You will get penalised by <span className="font-bold text-red-400">10%</span>.</div>
-            <button onClick={() => setWithdrawStake(null)} className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 mb-2">Proceed</button>
+            {txHash && (
+              <div className="mb-2">
+                <a href={`https://explorer.sepolia.mantle.xyz/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline break-all">View Transaction: {txHash}</a>
+              </div>
+            )}
+            {withdrawing ? (
+              <div className="text-zinc-400 mb-2">Withdrawing...</div>
+            ) : (
+              <button onClick={() => handleWithdraw(withdrawStake)} className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 mb-2">Proceed</button>
+            )}
             <button onClick={() => setWithdrawStake(null)} className="w-full py-2 px-4 text-zinc-400 hover:text-white transition-all">Cancel</button>
+            {error && <div className="text-red-500 mt-2">{error}</div>}
           </div>
         </div>
       )}

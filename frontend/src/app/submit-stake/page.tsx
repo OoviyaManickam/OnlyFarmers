@@ -6,15 +6,19 @@ import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { mantleSepoliaTestnet } from 'viem/chains';
+import { Contract_ABI, Contract_Address } from '@/components/abi';
+import { parseEther, createWalletClient, custom } from 'viem';
+
+declare global {
+  interface Window {
+    ethereum?: unknown;
+  }
+}
 
 // Token options with their icons and decimals
 const tokenOptions = [
-  { symbol: 'ETH', name: 'Ethereum', icon: '🔷', decimals: 18 },
-  { symbol: 'BTC', name: 'Bitcoin', icon: '₿', decimals: 8 },
-  { symbol: 'SOL', name: 'Solana', icon: '◎', decimals: 9 },
-  { symbol: 'USDT', name: 'Tether', icon: '💵', decimals: 6 },
-  { symbol: 'USDC', name: 'USD Coin', icon: '💲', decimals: 6 },
-  { symbol: 'BNB', name: 'Binance Coin', icon: '🔶', decimals: 18 },
+  { symbol: 'MNT', name: 'Mantle Token', icon: '💲', decimals: 18 },
 ];
 
 const durationOptions = [
@@ -23,13 +27,27 @@ const durationOptions = [
   { value: '12', label: '1 Year', multiplier: 1 },
 ];
 
+type SelectedFarm = {
+  id: string;
+  piCoreId: string;
+  maxYield: number;
+  health: string;
+  yieldScore: number;
+  apy: number;
+  status: string;
+  growthData: number[];
+};
+
 export default function SubmitStakePage() {
-  const [selectedFarm, setSelectedFarm] = useState<any>(null);
+  const [selectedFarm, setSelectedFarm] = useState<SelectedFarm | null>(null);
   const [stakeAmount, setStakeAmount] = useState("");
   const [selectedToken, setSelectedToken] = useState(tokenOptions[0]);
   const [selectedDuration, setSelectedDuration] = useState(durationOptions[0]);
   const [showTokenDropdown, setShowTokenDropdown] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isStaking, setIsStaking] = useState(false);
+  const [stakeError, setStakeError] = useState<string | null>(null);
+  const [txHash, setTxHash] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,7 +60,7 @@ export default function SubmitStakePage() {
   }, [router]);
 
   const calculateReturns = (amount: string, duration: string) => {
-    if (!amount) return { annual: '0.00', total: '0.00' };
+    if (!amount || !selectedFarm) return { annual: '0.00', total: '0.00' };
     const numAmount = parseFloat(amount);
     const annualYield = (numAmount * selectedFarm.apy) / 100;
     const durationMultiplier = durationOptions.find(d => d.value === duration)?.multiplier || 1;
@@ -53,11 +71,67 @@ export default function SubmitStakePage() {
     };
   };
 
-  const handleConfirmStake = () => {
-    setShowSuccess(true);
-    setTimeout(() => {
-      router.push('/start-stake');
-    }, 4000);
+  const handleConfirmStake = async () => {
+    setStakeError(null);
+    if (typeof window === 'undefined' || !window.ethereum) {
+      setStakeError('Please connect your wallet (MetaMask or compatible).');
+      return;
+    }
+    if (!selectedFarm || !stakeAmount || isNaN(Number(stakeAmount)) || Number(stakeAmount) <= 0) {
+      setStakeError('Please enter a valid stake amount.');
+      return;
+    }
+    setIsStaking(true);
+    try {
+      // Request wallet connection
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const accounts = await (window.ethereum as any).request({ method: 'eth_requestAccounts' });
+      if (!accounts || accounts.length === 0) {
+        setStakeError('No wallet account found. Please connect your wallet.');
+        setIsStaking(false);
+        return;
+      }
+      const account = accounts[0];
+      // Extract farm id (assume format FARM-123)
+      const farmId = selectedFarm.id.replace('FARM-', '');
+      // Duration: 1, 3, or 6 (months)
+      let duration = Number(selectedDuration.value);
+      if (![1, 3, 6].includes(duration)) {
+        // fallback: if user picks 12, treat as 6
+        duration = 6;
+      }
+      // Amount in wei
+      const value = parseEther(stakeAmount);
+      // Send transaction
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const walletClient = createWalletClient({
+        transport: custom(window.ethereum as any),
+        chain: mantleSepoliaTestnet,
+        account,
+      });
+      const hash = await walletClient.writeContract({
+        address: Contract_Address,
+        abi: Contract_ABI,
+        functionName: 'stake',
+        args: [BigInt(farmId), BigInt(duration)],
+        value,
+        chain: mantleSepoliaTestnet,
+        account,
+      });
+      setTxHash(hash);
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.push('/start-stake');
+      }, 8000);
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err && 'message' in err) {
+        setStakeError((err as { message?: string }).message || 'Transaction failed.');
+      } else {
+        setStakeError('Transaction failed.');
+      }
+    } finally {
+      setIsStaking(false);
+    }
   };
 
   if (!selectedFarm) {
@@ -99,37 +173,37 @@ export default function SubmitStakePage() {
               >
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="text-xl font-bold text-white font-space-grotesk">{selectedFarm.id}</h3>
-                    <p className="text-zinc-400 text-sm">PiCore ID: {selectedFarm.piCoreId}</p>
+                    <h3 className="text-xl font-bold text-white font-space-grotesk">{selectedFarm?.id}</h3>
+                    <p className="text-zinc-400 text-sm">PiCore ID: {selectedFarm?.piCoreId}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm ${
-                    selectedFarm.status === "Available" 
+                    selectedFarm?.status === "Available" 
                       ? "bg-green-500/20 text-green-400" 
                       : "bg-red-500/20 text-red-400"
                   }`}>
-                    {selectedFarm.status}
+                    {selectedFarm?.status}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Max Yield</p>
-                    <p className="text-xl font-bold text-blue-500">{selectedFarm.maxYield}%</p>
+                    <p className="text-xl font-bold text-blue-500">{selectedFarm?.maxYield}%</p>
                   </div>
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Farm Health</p>
-                    <p className="text-xl font-bold text-cyan-500">{selectedFarm.health}</p>
+                    <p className="text-xl font-bold text-cyan-500">{selectedFarm?.health}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Yield Score</p>
-                    <p className="text-xl font-bold text-purple-500">{selectedFarm.yieldScore}</p>
+                    <p className="text-xl font-bold text-purple-500">{selectedFarm?.yieldScore}</p>
                   </div>
                   <div className="bg-zinc-800/30 p-3 rounded-xl">
                     <p className="text-zinc-400 text-sm">Farm APY</p>
-                    <p className="text-xl font-bold text-blue-500">{selectedFarm.apy}%</p>
+                    <p className="text-xl font-bold text-blue-500">{selectedFarm?.apy}%</p>
                   </div>
                 </div>
 
@@ -142,7 +216,7 @@ export default function SubmitStakePage() {
                   <div className="h-32 relative">
                     <svg className="w-full h-full" viewBox="0 0 100 50" preserveAspectRatio="none">
                       <path
-                        d={selectedFarm.growthData.map((value: number, i: number) => 
+                        d={selectedFarm?.growthData?.map((value: number, i: number) => 
                           `${i === 0 ? 'M' : 'L'} ${i * 20} ${50 - value * 2}`
                         ).join(' ')}
                         fill="none"
@@ -308,18 +382,31 @@ export default function SubmitStakePage() {
                             <p className="text-zinc-400">
                               {stakeAmount} {selectedToken.symbol} successfully staked for {selectedDuration.label}
                             </p>
-                            {/* <p className="text-zinc-500 text-sm mt-2">Redirecting in 10 seconds...</p> */}
+                            {txHash && (
+                              <a
+                                href={`https://explorer.sepolia.mantle.xyz/tx/${txHash}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-4 text-blue-400 underline break-all"
+                              >
+                                View Transaction: {txHash}
+                              </a>
+                            )}
                           </div>
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  <button 
+                  {stakeError && (
+                    <div className="text-red-500 text-center mb-2">{stakeError}</div>
+                  )}
+                  <button
                     onClick={handleConfirmStake}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
+                    disabled={isStaking}
+                    className={`w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 ${isStaking ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
-                    Confirm Stake
+                    {isStaking ? 'Staking...' : 'Confirm Stake'}
                   </button>
                 </div>
               </motion.div>
