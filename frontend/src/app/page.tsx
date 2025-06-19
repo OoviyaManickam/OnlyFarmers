@@ -52,14 +52,17 @@ export default function HomePage() {
               Real Data. Real Farms. Real Stakes.
             </p>
             
-            <p className="max-w-3xl mx-auto text-lg md:text-xl text-zinc-300 leading-relaxed font-space-grotesk relative">
-              Powered by DePIN to Farm. Stake. Earn. No Hassle. 
-              <span className="block mt-2">
-                Turning real-time farm data into smart investments - where crops grow, profits flow, and Web3 complexity stays out of sight!
-              </span>
+            <p className="text-lg max-w-3xl md:text-xl lg:text-xl text-zinc-400 font-space-grotesk tracking-wider relative">
+            Bridging speculation and sustainability — with DePIN devices that turn your stake into real harvests and real-world change.
             </p>
+            {/* <p className="max-w-3xl mx-auto text-lg md:text-xl text-zinc-300 leading-relaxed font-space-grotesk relative">
+            Bridging speculation and sustainability — with DePIN devices that turn your stake into real harvests and real-world change. */}
+              {/* <span className="block mt-2">
+                Turning real-time farm data into smart investments - where crops grow, profits flow, and Web3 complexity stays out of sight!
+              </span> */}
+            {/* </p> */}
             
-            <button className="mt-4 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide relative">
+            <button className="mt-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-black rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 font-space-grotesk tracking-wide relative">
               Get Started
             </button>
           </div>
