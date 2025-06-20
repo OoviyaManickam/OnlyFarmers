@@ -4,7 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { createWalletClient, custom } from 'viem';
+import { createWalletClient, custom, type EIP1193Provider } from 'viem';
+import { mantleSepoliaTestnet } from 'viem/chains';
+
+declare global {
+  interface Window {
+    ethereum?: EIP1193Provider;
+  }
+}
 
 const navigation = [
   { name: 'Stake', href: '/stake' },
@@ -32,17 +39,55 @@ export default function Navbar() {
         setConnecting(false);
         return;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+      // First request account access
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+
       const walletClient = createWalletClient({
-        transport: custom(window.ethereum as any),
+        transport: custom(window.ethereum as EIP1193Provider),
+        chain: mantleSepoliaTestnet,
       });
+
       const [account] = await walletClient.getAddresses();
+      
+      // Request chain switch
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x138B' }], // 5001 in hex for Mantle Sepolia
+        });
+      } catch (switchError: unknown) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError && typeof switchError === 'object' && 'code' in switchError && switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x138B',
+                chainName: 'Mantle Sepolia',
+                nativeCurrency: {
+                  name: 'MNT',
+                  symbol: 'MNT',
+                  decimals: 18
+                },
+                rpcUrls: ['https://rpc.sepolia.mantle.xyz'],
+                blockExplorerUrls: ['https://explorer.sepolia.mantle.xyz']
+              }]
+            });
+          } catch {
+            alert('Failed to add Mantle Sepolia network.');
+            return;
+          }
+        }
+      }
+
       setWallet(account);
       if (typeof window !== 'undefined') {
         localStorage.setItem('connectedWallet', account);
       }
-    } catch {
-      alert('Failed to connect wallet.');
+    } catch (error) {
+      console.error('Connection error:', error);
+      alert('Failed to connect wallet. Please make sure you have MetaMask installed and try again.');
     } finally {
       setConnecting(false);
     }

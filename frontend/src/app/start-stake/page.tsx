@@ -32,6 +32,7 @@ const dummyGrowthData = [
 
 type Farm = {
   id: string;
+  name: string;
   piCoreId: string;
   maxYield: number;
   health: string;
@@ -73,6 +74,7 @@ export default function StartStakePage() {
           setFarms(
             (data as ContractFarm[]).map((farm, idx: number) => ({
               id: `FARM-${farm.id.toString()}`,
+              name: farm.name,
               piCoreId: farm.piId,
               health: Number(farm.health) > 80 ? "Excellent" : Number(farm.health) > 60 ? "Good" : "Average",
               apy: Number(farm.apy),
@@ -200,7 +202,7 @@ export default function StartStakePage() {
                   <div className="bg-gradient-to-br from-zinc-900/50 to-black p-6 rounded-2xl border border-zinc-800/50 hover:border-blue-500/50 transition-all duration-300">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-xl font-bold text-white font-space-grotesk">{farm.id}</h3>
+                        <h3 className="text-xl font-bold text-white font-space-grotesk">{farm.name}</h3>
                         <p className="text-zinc-400 text-sm">PiCore ID: {farm.piCoreId}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-sm ${

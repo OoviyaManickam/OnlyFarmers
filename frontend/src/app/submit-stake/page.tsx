@@ -8,11 +8,11 @@ import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon, CheckCircleIcon } from '@
 import { useRouter } from 'next/navigation';
 import { mantleSepoliaTestnet } from 'viem/chains';
 import { Contract_ABI, Contract_Address } from '@/components/abi';
-import { parseEther, createWalletClient, custom } from 'viem';
+import { parseEther, createWalletClient, custom, type EIP1193Provider } from 'viem';
 
 declare global {
   interface Window {
-    ethereum?: unknown;
+    ethereum?: EIP1193Provider;
   }
 }
 
@@ -29,6 +29,7 @@ const durationOptions = [
 
 type SelectedFarm = {
   id: string;
+  name: string;
   piCoreId: string;
   maxYield: number;
   health: string;
@@ -60,11 +61,14 @@ export default function SubmitStakePage() {
   }, [router]);
 
   const calculateReturns = (amount: string, duration: string) => {
-    if (!amount || !selectedFarm) return { annual: '0.00', total: '0.00' };
+    if (!amount) return { annual: '0.00', total: '0.00' };
     const numAmount = parseFloat(amount);
-    const annualYield = (numAmount * selectedFarm.apy) / 100;
-    const durationMultiplier = durationOptions.find(d => d.value === duration)?.multiplier || 1;
-    const totalYield = annualYield * durationMultiplier;
+    const annualRate = 0.12; // 12% APY
+    const annualYield = numAmount * annualRate;
+    const monthlyRate = annualRate / 12; // Monthly rate
+    const durationInMonths = parseInt(duration);
+    const totalYield = numAmount * (monthlyRate * durationInMonths);
+    
     return {
       annual: annualYield.toFixed(2),
       total: totalYield.toFixed(2)
@@ -84,8 +88,7 @@ export default function SubmitStakePage() {
     setIsStaking(true);
     try {
       // Request wallet connection
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const accounts = await (window.ethereum as any).request({ method: 'eth_requestAccounts' });
+      const accounts = await (window.ethereum as EIP1193Provider).request({ method: 'eth_requestAccounts' });
       if (!accounts || accounts.length === 0) {
         setStakeError('No wallet account found. Please connect your wallet.');
         setIsStaking(false);
@@ -103,9 +106,8 @@ export default function SubmitStakePage() {
       // Amount in wei
       const value = parseEther(stakeAmount);
       // Send transaction
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const walletClient = createWalletClient({
-        transport: custom(window.ethereum as any),
+        transport: custom(window.ethereum as EIP1193Provider),
         chain: mantleSepoliaTestnet,
         account,
       });
@@ -173,7 +175,7 @@ export default function SubmitStakePage() {
               >
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="text-xl font-bold text-white font-space-grotesk">{selectedFarm?.id}</h3>
+                    <h3 className="text-xl font-bold text-white font-space-grotesk">{selectedFarm?.name}</h3>
                     <p className="text-zinc-400 text-sm">PiCore ID: {selectedFarm?.piCoreId}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm ${
