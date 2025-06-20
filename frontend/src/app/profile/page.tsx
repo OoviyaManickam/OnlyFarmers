@@ -3,18 +3,19 @@
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { useState, useEffect } from 'react';
-import { createWalletClient, custom, createPublicClient, http } from 'viem';
+import { createWalletClient, custom, createPublicClient, http, isAddress } from 'viem';
 import { Contract_ABI, Contract_Address } from '@/components/abi';
 import { mantleSepoliaTestnet } from 'viem/chains';
 
 declare global {
   interface Window {
-    ethereum?: unknown;
+    ethereum?: import('viem').EIP1193Provider;
   }
 }
 
 type StakeInfo = {
   farmId: bigint;
+  farmName: string;
   amount: bigint;
   startTime: bigint;
   duration: bigint;
@@ -42,11 +43,17 @@ export default function ProfilePage() {
           setIsLoading(false);
           return;
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+        // Validate contract address
+        if (!Contract_Address || !isAddress(Contract_Address)) {
+          setError('Invalid contract address configuration.');
+          setIsLoading(false);
+          return;
+        }
+
         const walletClient = createWalletClient({
           chain: mantleSepoliaTestnet,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          transport: custom(window.ethereum as any),
+          transport: custom(window.ethereum as import('viem').EIP1193Provider),
         });
         const [account] = await walletClient.getAddresses();
         setWallet(account);
@@ -60,7 +67,23 @@ export default function ProfilePage() {
           functionName: 'getUserStakeInfo',
           args: [account],
         });
-        setStakes(data as StakeInfo[]);
+
+        // Fetch farm names for each stake
+        const stakesWithNames = await Promise.all((data as StakeInfo[]).map(async (stake) => {
+          const farmData = await publicClient.readContract({
+            address: Contract_Address,
+            abi: Contract_ABI,
+            functionName: 'farms',
+            args: [stake.farmId],
+          }) as [bigint, string, string, bigint, bigint, `0x${string}`];
+          
+          return {
+            ...stake,
+            farmName: farmData[1], // Farm name is at index 1
+          };
+        }));
+        
+        setStakes(stakesWithNames);
       } catch (err) {
         if (typeof err === 'object' && err && 'message' in err) {
           setError((err as { message?: string }).message || 'Failed to fetch stakes.');
@@ -84,11 +107,9 @@ export default function ProfilePage() {
         setWithdrawing(false);
         return;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const walletClient = createWalletClient({
         chain: mantleSepoliaTestnet,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        transport: custom(window.ethereum as any),
+        transport: custom(window.ethereum as import('viem').EIP1193Provider),
       });
       const [account] = await walletClient.getAddresses();
       const hash = await walletClient.writeContract({
@@ -161,7 +182,7 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-4">
                         <span className="text-2xl">🪙</span>
                         <div>
-                          <div className="font-semibold text-white">Farm #{stake.farmId.toString()}</div>
+                          <div className="font-semibold text-white">{stake.farmName}</div>
                           <div className="text-zinc-400 text-xs">Amount: {Number(stake.amount) / 1e18} ETH • {stake.withdrawn ? 'Withdrawn' : 'Active'}</div>
                         </div>
                       </div>
