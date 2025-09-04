@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { createWalletClient, custom, type EIP1193Provider } from 'viem';
-import { mantleSepoliaTestnet } from 'viem/chains';
+import { arbitrumSepolia } from 'viem/chains';
 
 declare global {
   interface Window {
@@ -45,7 +45,7 @@ export default function Navbar() {
 
       const walletClient = createWalletClient({
         transport: custom(window.ethereum as EIP1193Provider),
-        chain: mantleSepoliaTestnet,
+        chain: arbitrumSepolia,
       });
 
       const [account] = await walletClient.getAddresses();
@@ -63,15 +63,15 @@ export default function Navbar() {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [{
-                chainId: '0x138B',
-                chainName: 'Mantle Sepolia',
+                chainId: '0x66eee',
+                chainName: 'Arbitrum Sepolia',
                 nativeCurrency: {
-                  name: 'MNT',
-                  symbol: 'MNT',
+                  name: 'ETH',
+                  symbol: 'ETH',
                   decimals: 18
                 },
-                rpcUrls: ['https://rpc.sepolia.mantle.xyz'],
-                blockExplorerUrls: ['https://explorer.sepolia.mantle.xyz']
+                rpcUrls: ['https://arbitrum-sepolia.therpc.io'],
+                blockExplorerUrls: ['https://sepolia.arbiscan.io/']
               }]
             });
           } catch {

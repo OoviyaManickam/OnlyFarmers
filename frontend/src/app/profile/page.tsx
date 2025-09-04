@@ -5,7 +5,7 @@ import Footer from '@/components/footer';
 import { useState, useEffect } from 'react';
 import { createWalletClient, custom, createPublicClient, http, isAddress } from 'viem';
 import { Contract_ABI, Contract_Address } from '@/components/abi';
-import { mantleSepoliaTestnet } from 'viem/chains';
+import { arbitrumSepolia } from 'viem/chains';
 
 declare global {
   interface Window {
@@ -52,13 +52,13 @@ export default function ProfilePage() {
         }
 
         const walletClient = createWalletClient({
-          chain: mantleSepoliaTestnet,
+          chain: arbitrumSepolia,
           transport: custom(window.ethereum as import('viem').EIP1193Provider),
         });
         const [account] = await walletClient.getAddresses();
         setWallet(account);
         const publicClient = createPublicClient({
-          chain: mantleSepoliaTestnet,
+          chain: arbitrumSepolia,
           transport: http(),
         });
         const data = await publicClient.readContract({
@@ -108,7 +108,7 @@ export default function ProfilePage() {
         return;
       }
       const walletClient = createWalletClient({
-        chain: mantleSepoliaTestnet,
+        chain: arbitrumSepolia,
         transport: custom(window.ethereum as import('viem').EIP1193Provider),
       });
       const [account] = await walletClient.getAddresses();
@@ -118,7 +118,7 @@ export default function ProfilePage() {
         functionName: 'withdraw',
         args: [BigInt(index)],
         account,
-        chain: mantleSepoliaTestnet,
+        chain: arbitrumSepolia,
       });
       setTxHash(hash);
       setWithdrawStake(null);

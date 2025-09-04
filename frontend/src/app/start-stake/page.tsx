@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { createPublicClient, http } from 'viem';
-import { mantleSepoliaTestnet } from 'viem/chains';
+import { arbitrumSepolia } from 'viem/chains';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { MagnifyingGlassIcon, FunnelIcon, ChartBarIcon } from '@heroicons/react/24/outline';
@@ -12,7 +12,7 @@ import { Contract_ABI, Contract_Address } from '@/components/abi';
 
 // You can change 'mainnet' to your target chain, or use a custom RPC URL
 const publicClient = createPublicClient({
-  chain: mantleSepoliaTestnet,
+  chain: arbitrumSepolia,
   transport: http(),
 });
 

@@ -6,7 +6,7 @@ import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { ChartBarIcon, ArrowLeftIcon, ChevronDownIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
-import { mantleSepoliaTestnet } from 'viem/chains';
+import { arbitrumSepolia } from 'viem/chains';
 import { Contract_ABI, Contract_Address } from '@/components/abi';
 import { parseEther, createWalletClient, custom, type EIP1193Provider } from 'viem';
 
@@ -108,7 +108,7 @@ export default function SubmitStakePage() {
       // Send transaction
       const walletClient = createWalletClient({
         transport: custom(window.ethereum as EIP1193Provider),
-        chain: mantleSepoliaTestnet,
+        chain: arbitrumSepolia,
         account,
       });
       const hash = await walletClient.writeContract({
@@ -117,7 +117,7 @@ export default function SubmitStakePage() {
         functionName: 'stake',
         args: [BigInt(farmId), BigInt(duration)],
         value,
-        chain: mantleSepoliaTestnet,
+        chain: arbitrumSepolia,
         account,
       });
       setTxHash(hash);
