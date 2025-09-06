@@ -18,7 +18,7 @@ declare global {
 
 // Token options with their icons and decimals
 const tokenOptions = [
-  { symbol: 'MNT', name: 'Mantle Token', icon: '💲', decimals: 18 },
+  { symbol: 'ETH', name: 'Ethereum', icon: '💲', decimals: 18 },
 ];
 
 const durationOptions = [
