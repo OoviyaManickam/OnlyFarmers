@@ -386,7 +386,7 @@ export default function SubmitStakePage() {
                             </p>
                             {txHash && (
                               <a
-                                href={`https://explorer.sepolia.mantle.xyz/tx/${txHash}`}
+                                href={`https://sepolia.arbiscan.io/tx/${txHash}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="mt-4 text-blue-400 underline break-all"
